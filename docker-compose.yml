@@ -1,0 +1,51 @@
+version: '3.6'
+services:
+  pg:
+    image: postgres:10
+    restart: always
+    container_name: pg
+    ports:
+      - 5432:5432
+    environment:
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    container_name: pg-admin
+    environment:
+      - "PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}"
+      - "PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}"
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - pg
+    networks:
+      - frontend
+      - backend
+
+  redis:
+    image: redis:6.0
+    restart: always
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - frontend
+      - backend
+
+volumes:
+  pg-data:
+    driver: local
+  pgadmin-data:
+    driver: local
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
